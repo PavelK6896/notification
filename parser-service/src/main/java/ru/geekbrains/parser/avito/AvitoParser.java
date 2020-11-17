@@ -21,6 +21,7 @@ import ru.geekbrains.service.parserservice.ParserService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -60,6 +61,8 @@ public class AvitoParser extends Parser implements Runnable {
     @Value("${parsers.avito.maxPage:1}")
     private int maxPage;
 
+    private HashMap<String, String> cityMap;
+
     @Autowired
     public AvitoParser(AvitoClient client, ParserService parserService, GeoService geoService) {
         this.client = client;
@@ -67,6 +70,7 @@ public class AvitoParser extends Parser implements Runnable {
         this.geoService = geoService;
 
 //        this.parserService.register(this);
+        this.cityMap = new HashMap<>();
     }
 
     public void start(String country, String city) {
@@ -82,8 +86,12 @@ public class AvitoParser extends Parser implements Runnable {
     public void run() {
 
         List<ApartmentParserInterface> avitoApartments = this.parse(this.task);
-        this.setApartmentList(avitoApartments);
-        log.info(String.valueOf(avitoApartments.size()));
+        if (avitoApartments != null) {
+            this.setApartmentList(avitoApartments);
+            log.info(String.valueOf(avitoApartments.size()));
+        } else {
+            this.setApartmentList(new ArrayList<ApartmentParserInterface>());
+        }
         this.setProcessing(false);
     }
 
@@ -95,8 +103,13 @@ public class AvitoParser extends Parser implements Runnable {
     public List<ApartmentParserInterface> parse(Task task) {
 
         try {
-            Integer cityId = this.findCityId(task.getCity());
-            String prefix = this.findCityPrefix(cityId);
+
+            String prefix = cityMap.get(task.getCity() == null);
+            if (prefix == null) {
+                Integer cityId = this.findCityId(task.getCity());
+                prefix = this.findCityPrefix(cityId);
+                cityMap.put(task.getCity(), prefix);
+            }
 
             ArrayList<ApartmentParserInterface> avitoApartments = new ArrayList<>();
             ArrayList<String> allLinks = new ArrayList<>();
@@ -111,10 +124,18 @@ public class AvitoParser extends Parser implements Runnable {
             }
 
             for (String apartmentUrl : allLinks) {
+                log.info(apartmentUrl);
                 AvitoApartment avitoApartment = this.parseApartment(apartmentUrl);
                 if (!avitoApartment.isEmpty()) {
                     avitoApartments.add(avitoApartment);
-                    break;
+                    if (avitoApartments.size() >= 10) {
+                        break;
+                    }
+                }
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -138,16 +159,19 @@ public class AvitoParser extends Parser implements Runnable {
             throw new CityNotFound("Empty city list");
         }
 
-        JsonObject object = new Gson().fromJson(response, JsonObject.class);
-        JsonArray locations = object.get("result").getAsJsonObject().get("locations").getAsJsonArray();
-
-        for (JsonElement location : locations) {
-            JsonObject locationObject = location.getAsJsonObject();
-            Integer cityId = locationObject.get("id").getAsInt();
-            String name = locationObject.get("names").getAsJsonObject().get("1").getAsString();
-            if (name.equalsIgnoreCase(city)) {
-                return cityId;
+        try {
+            JsonObject object = new Gson().fromJson(response, JsonObject.class);
+            JsonArray locations = object.get("result").getAsJsonObject().get("locations").getAsJsonArray();
+            for (JsonElement location : locations) {
+                JsonObject locationObject = location.getAsJsonObject();
+                Integer cityId = locationObject.get("id").getAsInt();
+                String name = locationObject.get("names").getAsJsonObject().get("1").getAsString();
+                if (name.equalsIgnoreCase(city)) {
+                    return cityId;
+                }
             }
+        } catch (NullPointerException e) {
+            throw new CityNotFound("IP blocked");
         }
 
         throw new CityNotFound("City not found");
@@ -196,6 +220,9 @@ public class AvitoParser extends Parser implements Runnable {
         avitoApartment.setCity(this.task.getCity());
 
         String page = this.client.apartmentPage(url);
+        if (page == null) {
+            return avitoApartment;
+        }
         Document doc = Jsoup.parse(page, this.client.getBaseUrl());
 
 

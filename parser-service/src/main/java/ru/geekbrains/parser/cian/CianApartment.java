@@ -48,6 +48,7 @@ public class CianApartment implements ApartmentParserInterface {
 
     private String house;
 
+    private Boolean isDaily;
 
     public String getUrl() {
         return url;
@@ -220,6 +221,9 @@ public class CianApartment implements ApartmentParserInterface {
         return house;
     }
 
+    @Override
+    public Boolean getIsDaily() {return isDaily;}
+
     public void setCountry(String country) {
         this.country = country;
     }
@@ -240,5 +244,7 @@ public class CianApartment implements ApartmentParserInterface {
         this.house = house;
     }
 
-
+    public void setIsDaily(Boolean isDaily) {
+        this.isDaily = isDaily;
+    }
 }

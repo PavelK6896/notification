@@ -1,6 +1,7 @@
 package ru.geekbrains.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -42,13 +44,17 @@ public class UserService {
     public void savePersonalData(String login, ProfileUserDto profileUserDto) {
         User user = userRepository.findByLogin(login).orElseThrow(() ->
                 new UsernameNotFoundException("User doesn't exists"));
-        PersonalData personalData = new PersonalData();
+        PersonalData personalData;
+        if ((personalData = user.getPersonalData()) == null){
+            personalData = new PersonalData();
+        }
         personalData.setWhatsApp(profileUserDto.getWhatsApp());
         personalData.setEmail(profileUserDto.getEmail());
         personalData.setFacebook(profileUserDto.getFacebook());
         personalData.setTelegram(profileUserDto.getTelegram());
         user.setPersonalData(personalData);
-        userRepository.save(user);
+        User save = userRepository.save(user);
+        log.info("профиль добавлен " + save.getPersonalData());
     }
 
     public PersonalData getPersonalData(String login) {

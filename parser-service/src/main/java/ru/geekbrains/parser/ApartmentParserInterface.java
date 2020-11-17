@@ -36,4 +36,6 @@ public interface ApartmentParserInterface {
     public String getHouse();
 
     public Short getFloorsCount();
+
+    public Boolean getIsDaily();
 }

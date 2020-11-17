@@ -64,4 +64,7 @@ public class Ad {
     @ManyToOne
     @JoinColumn(name = "address_id")
     Address address;
+
+    @Column(name = "is_daily", columnDefinition = "boolean default false")
+    Boolean isDaily;
 }

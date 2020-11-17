@@ -17,6 +17,8 @@ public class CianRegionDefinerImpl implements CianRegionDefiner {
 
     private CianRegionsService cianRegionsService;
 
+    private final String CITY_TYPE = "г"; //ищем только в городах
+
     @Autowired
     public CianRegionDefinerImpl(RussianAddressObjectService russianAddressObjectService, CianRegionsService cianRegionsService) {
         this.russianAddressObjectService = russianAddressObjectService;
@@ -24,7 +26,7 @@ public class CianRegionDefinerImpl implements CianRegionDefiner {
     }
 
     public List<String> getRegions(String city) {
-        List<RussianAddressObject> objects = russianAddressObjectService.findByFormalName(city);
+        List<RussianAddressObject> objects = russianAddressObjectService.findByFormalNameAndShortName(city, CITY_TYPE);
         return objects.stream().map(RussianAddressObject::getRegionCode)
                 .filter(code -> !code.equals("99")) // Исключаем Байконур (ЦИАН не умеет там искать)
                 .map(code -> cianRegionsService.findByRussianCode(code)

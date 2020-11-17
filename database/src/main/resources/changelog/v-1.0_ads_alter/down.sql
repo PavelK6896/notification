@@ -1,0 +1,37 @@
+ALTER TABLE advertisement.apartments
+ALTER COLUMN id DROP IDENTITY;
+
+GO
+
+ALTER TABLE geo.countries
+ALTER COLUMN id DROP IDENTITY;
+
+GO
+
+ALTER TABLE geo.cities
+ALTER COLUMN id DROP IDENTITY;
+
+GO
+
+ALTER TABLE geo.regions
+ALTER COLUMN id DROP IDENTITY;
+
+GO
+
+ALTER TABLE geo.districts
+ALTER COLUMN id DROP IDENTITY;
+
+GO
+
+ALTER TABLE geo.streets
+ALTER COLUMN id DROP IDENTITY;
+
+GO
+
+ALTER TABLE geo.addresses
+ALTER COLUMN id DROP IDENTITY;
+
+GO
+
+ALTER TABLE advertisement.apartments
+DROP COLUMN is_daily;

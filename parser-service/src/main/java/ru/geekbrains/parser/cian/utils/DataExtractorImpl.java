@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
-import ru.geekbrains.entity.*;
 import ru.geekbrains.parser.cian.CianApartment;
+import ru.geekbrains.parser.cian.utils.exception.FloorNotFoundException;
 import ru.geekbrains.parser.cian.utils.exception.PeriodNotFoundException;
 import ru.geekbrains.parser.cian.utils.exception.PriceNotFoundException;
 import ru.geekbrains.parser.cian.utils.exception.SquareInfoNotFoundException;
@@ -80,6 +80,8 @@ public class DataExtractorImpl implements DataExtractor {
         cianApartment.setDescription(this.getDescription(adTag));
         cianApartment.setInfoDescription(this.getTitle(adTag));
         cianApartment.setUrl(this.getLink(adTag));
+        cianApartment.setFloor(this.getFloor(adTag));
+        cianApartment.setIsDaily(this.getPeriod(adTag));
 
         return cianApartment;
     }
@@ -126,35 +128,26 @@ public class DataExtractorImpl implements DataExtractor {
 
     private Float getQuadrature(Element adTag) {
 
-        Element adTitle = adTag.select("span[data-mark$=OfferTitle]").first();
-        Element adSubtitle = adTag.select("span[data-mark$=OfferSubtitle]").first();
-
         Pattern squarePattern = Pattern.compile("\\d{1,4},?\\d{1,2}?\\sм²");
-        Matcher matcherSquareInTitle = squarePattern.matcher(adTitle.text());
-        Matcher matcherSquareInSubtitle = null;
-        if (adSubtitle != null) {
-            matcherSquareInSubtitle = squarePattern.matcher(adSubtitle.text());
-        }
+        Matcher matcherSquareInTitle = squarePattern.matcher(getTitle(adTag));
         String square;
         if (matcherSquareInTitle.find()) {
             square = matcherSquareInTitle.group();
-        } else if (matcherSquareInSubtitle != null && matcherSquareInSubtitle.find()) {
-            square = matcherSquareInSubtitle.group();
         } else {
             throw new SquareInfoNotFoundException("Apartment's square hasn't been found on the cian.ru page");
         }
-        String squareWithoutMetersAndRounded = String.valueOf(Math.round(Float.parseFloat(square.replaceAll("\\sм²", "").replaceAll(",", ""))));
+        String squareWithoutMetersAndRounded = String.valueOf(Float.parseFloat(square.replaceAll("\\sм²", "").replaceAll(",", ".")));
         return Float.parseFloat(squareWithoutMetersAndRounded);
 
     }
 
-    private String getPeriod(Element adTag) {
+    private Boolean getPeriod(Element adTag) {
         Element adPriceContent = adTag.select("span[data-mark$=MainPrice]").first();
         Pattern periodPattern = Pattern.compile("[ЁёА-я]{3,5}", Pattern.UNICODE_CHARACTER_CLASS);
         Matcher matcherPeriod = periodPattern.matcher(adPriceContent.text());
-        String period;
+        boolean period;
         if (matcherPeriod.find()) {
-            period = matcherPeriod.group().equals("мес") ? "месяц" : matcherPeriod.group();
+            period = matcherPeriod.group().equals("сутки");
         } else {
             throw new PeriodNotFoundException("Period hasn't been found on the cian.ru page");
         }
@@ -191,5 +184,17 @@ public class DataExtractorImpl implements DataExtractor {
     private String getLink(Element adTag) {
         Element adLinkTag = adTag.selectFirst("div[data-name$=LinkArea]");
         return adLinkTag.selectFirst("a").attr("href");
+    }
+
+    private int getFloor(Element adTag) {
+        Pattern floorPattern = Pattern.compile("\\d{1,2}/\\d{1,2}");
+        Matcher floorMatcher = floorPattern.matcher(getTitle(adTag));
+        int floor = 0;
+        if (floorMatcher.find()) {
+            floor = Integer.parseInt(floorMatcher.group().substring(0, floorMatcher.group().indexOf("/")));
+        } else {
+            throw new FloorNotFoundException("Floor hasn't been found on the page");
+        }
+        return floor;
     }
 }

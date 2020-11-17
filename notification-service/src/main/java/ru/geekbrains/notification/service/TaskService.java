@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.geekbrains.entity.bot.BotData;
-import ru.geekbrains.notification.model.ResponseMessage;
+import ru.geekbrains.common.rest.ResponseMessage;
 
 @Service
 @RequiredArgsConstructor

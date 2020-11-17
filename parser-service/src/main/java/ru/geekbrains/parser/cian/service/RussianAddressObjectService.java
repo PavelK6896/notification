@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface RussianAddressObjectService {
 
-    List<RussianAddressObject> findByFormalName(String objectName);
+    List<RussianAddressObject> findByFormalNameAndShortName(String objectName, String cityType);
 
     Optional<RussianAddressObject> findByAoGuid(String aoGuid);
 }

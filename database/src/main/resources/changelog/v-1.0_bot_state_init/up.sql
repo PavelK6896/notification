@@ -2,7 +2,7 @@ CREATE SCHEMA bot;
 
 GO
 
-create table bot.answers (id  bigserial not null, city varchar(255), country varchar(255), floor int4, price int8, room int4, primary key (id));
+create table bot.answers (id  bigserial not null, city varchar(255), country varchar(255), floor varchar(255), min_price int8, max_price int8, rooms varchar(255), primary key (id));
 
 GO
 

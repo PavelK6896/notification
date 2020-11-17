@@ -67,6 +67,7 @@ public class AdService {
         ad.setAreaKitchen(apartment.getAreaKitchen());
         ad.setAreaLiving(apartment.getAreaLiving());
         ad.setFloor(apartment.getFloor());
+        ad.setIsDaily(apartment.getIsDaily());
     }
 
     @Transactional

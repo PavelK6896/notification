@@ -20,8 +20,8 @@ public class RussianAddressObjectServiceImpl implements RussianAddressObjectServ
     }
 
     @Override
-    public List<RussianAddressObject> findByFormalName(String objectName) {
-        return russianAddressObjectRepository.findByFormalName(objectName);
+    public List<RussianAddressObject> findByFormalNameAndShortName(String objectName, String cityType) {
+        return russianAddressObjectRepository.findByFormalNameAndShortName(objectName, cityType);
     }
 
     @Override

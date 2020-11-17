@@ -26,21 +26,24 @@ public class Answer {
     @Column(name = "city")
     String city;
 
-    @Column(name = "room")
-    int room;
+    @Column(name = "rooms")
+    String rooms;
 
-    @Column(name = "price")
-    long price;
+    @Column(name = "min_price")
+    long minPrice;
+
+    @Column(name = "max_price")
+    long maxPrice;
 
     @Column(name = "floor")
-    int floor;
+    String floor;
 
     @Override
     public String toString() {
         return  "\nСтрана: " + country +
                 "\nГород: " + city +
-                "\nКоличество комнат: " + room +
-                "\nЦена: " + price +
+                "\nКоличество комнат: " + rooms +
+                "\nЦена: {" + minPrice + " - " + maxPrice + "}" +
                 "\nЭтаж: " + floor;
     }
 }

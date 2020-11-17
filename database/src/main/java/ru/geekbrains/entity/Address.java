@@ -25,4 +25,8 @@ public class Address {
     @ManyToOne
     @JoinColumn(name = "street_id")
     Street street;
+
+    public String getAddressToString() {
+        return String.format("%s, %s, %s, %s",street.getCity().getCountry().getName(), street.getCity().getName(), street.getDistrict().getName(), street.getName());
+    }
 }

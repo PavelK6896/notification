@@ -1,5 +1,6 @@
 package ru.geekbrains.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -28,5 +29,6 @@ public class Region {
 
     @OneToMany(mappedBy = "region")
     @Cascade(CascadeType.ALL)
+    @JsonIgnore
     List<City> cities;
 }

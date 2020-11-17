@@ -1,50 +1,28 @@
 package ru.geekbrains.parser.cian;
 
 import com.gargoylesoftware.htmlunit.*;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.geekbrains.entity.Ad;
-import ru.geekbrains.entity.Address;
 import ru.geekbrains.entity.system.Proxy;
 import ru.geekbrains.model.Parser;
 import ru.geekbrains.model.Task;
 import ru.geekbrains.parser.ApartmentParserInterface;
-import ru.geekbrains.parser.cian.utils.AdsNotFoundException;
-import ru.geekbrains.parser.cian.utils.CaptchaException;
+import ru.geekbrains.parser.cian.utils.exception.AdsNotFoundException;
+import ru.geekbrains.parser.cian.utils.exception.CaptchaException;
 import ru.geekbrains.parser.cian.utils.CianRegionDefiner;
 import ru.geekbrains.parser.cian.utils.DataExtractor;
 import ru.geekbrains.service.parserservice.ParserService;
 import ru.geekbrains.service.system.ProxyService;
-import sun.management.VMOptionCompositeData;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -150,23 +128,6 @@ public class CianParser extends Parser implements Runnable {
                 driver.get(uri.toString());
                 Document document = Jsoup.parse(driver.getPageSource());
 
-
-                //*********** org.apache.http connection- 2st variant*****************
-//                CredentialsProvider credsProvider = new BasicCredentialsProvider();
-//                credsProvider.setCredentials(
-//                        new AuthScope(this.proxy.getHost(), Integer.parseInt(this.proxy.getPort())),
-//                        new UsernamePasswordCredentials(this.proxy.getLogin(), this.proxy.getPassword()));
-//                CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
-//                Document document = null;
-//                try (CloseableHttpResponse response = httpClient.execute(new HttpGet(uri.toString()))) {
-//                CloseableHttpResponse response = httpClient.execute(new HttpGet("https://ipinfo.io/ip"));
-//
-//                    document = Jsoup.parse(EntityUtils.toString(response.getEntity()));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-
-                assert document != null;
                 Elements adTags = document.getElementsByTag("article");
                 if (document.title().contains("Captcha"))
                     throw new CaptchaException("Your IP address has been blocked");
@@ -183,10 +144,9 @@ public class CianParser extends Parser implements Runnable {
                 if (!pageValueMark.equals("..")) {
                     hasNextPage = false;
                 }
-
                 pageValue = String.valueOf(Integer.parseInt(pageValue) + 1);
-
             }
+            pageValue = "1";
         }
         setProcessing(false);
     }

@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import ru.geekbrains.model.ResponseMessage;
+import ru.geekbrains.common.rest.ResponseMessage;
 import ru.geekbrains.model.Task;
 import ru.geekbrains.service.requesthandler.RequestHandlerService;
 

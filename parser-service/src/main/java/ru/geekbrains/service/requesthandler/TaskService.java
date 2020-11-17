@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.model.Task;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Queue;
 
 @Slf4j
@@ -24,14 +25,15 @@ public class TaskService {
     //отдает объект, но не удаляет его из очереди
     //нужно для того, чтобы задачи не дублировались, пока объект находится в работе
     public Task peek(){
-        log.info("задача передана в работу");
         return tasks.peek();
     }
 
     //обязательно удалить элемент после выполнения
-    public void poll(){
-        log.info("задача удалена");
+    public String poll(){
+        String taskId = tasks.peek().getTaskId();
         tasks.poll();
+        log.info(String.format("задача c id = %s удалена из очереди", taskId));
+        return taskId;
     }
 
     public boolean isEmpty(){

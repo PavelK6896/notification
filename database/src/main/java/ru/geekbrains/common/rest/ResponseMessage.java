@@ -1,13 +1,15 @@
-package ru.geekbrains.model;
+package ru.geekbrains.common.rest;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.minidev.json.annotate.JsonIgnore;
+import lombok.NoArgsConstructor;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResponseMessage {
     String title;
     String Details;

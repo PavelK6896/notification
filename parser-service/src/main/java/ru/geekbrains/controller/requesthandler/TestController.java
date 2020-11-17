@@ -6,8 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ru.geekbrains.entity.Country;
-import ru.geekbrains.model.ResponseMessage;
+import ru.geekbrains.common.rest.ResponseMessage;
 import ru.geekbrains.model.Task;
 import ru.geekbrains.service.requesthandler.RequestHandlerService;
 

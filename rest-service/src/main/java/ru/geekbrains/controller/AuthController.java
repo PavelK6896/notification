@@ -3,6 +3,7 @@ package ru.geekbrains.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,6 +24,7 @@ import java.security.Principal;
 @RequestMapping("/auth")
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final UserDetailsServiceImplements userDetailsServiceImplements;
@@ -59,6 +61,7 @@ public class AuthController {
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(Principal principal) throws JsonProcessingException {
         PersonalData personalData = userService.getPersonalData(principal.getName());
+        log.info("профиль отправлен " + personalData);
         return ResponseEntity.ok(objectMapper.writeValueAsString(personalData));
     }
 

@@ -53,6 +53,8 @@ public class AvitoApartment implements ApartmentParserInterface {
 
     private String house;
 
+    private Boolean isDaily;
+
 
     public String getUrl() {
         return url;
@@ -236,6 +238,11 @@ public class AvitoApartment implements ApartmentParserInterface {
         return house;
     }
 
+    @Override
+    public Boolean getIsDaily() {
+        return null;
+    }
+
     public void setCountry(String country) {
         this.country = country;
     }
@@ -265,5 +272,7 @@ public class AvitoApartment implements ApartmentParserInterface {
         this.house = house.trim();
     }
 
-
+    public void setDaily(Boolean daily) {
+        isDaily = daily;
+    }
 }

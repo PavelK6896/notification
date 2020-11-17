@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.geekbrains.common.rest.ResponseMessage;
 import ru.geekbrains.exception.DuplicateTaskException;
 import ru.geekbrains.exception.VariableBlankException;
-import ru.geekbrains.model.ResponseMessage;
 import ru.geekbrains.model.Task;
 
 @Service

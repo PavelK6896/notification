@@ -4,13 +4,13 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import ru.geekbrains.common.rest.ResponseMessage;
 import ru.geekbrains.model.Parser;
 import ru.geekbrains.model.Task;
 import ru.geekbrains.service.requesthandler.TaskService;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -54,6 +54,7 @@ public class ParserService {
         if (!taskService.isEmpty() && !processing) {
             log.info("start task!");
             parsers.forEach(p -> {
+                log.info("задача передана в работу");
                 p.start(taskService.peek().getCountry(), taskService.peek().getCity());
         });
         processing = true;
@@ -67,7 +68,11 @@ public class ParserService {
         } else {
             checkResult();
             if (parsers.stream().noneMatch(Parser::getProcessingStatus)) {
+                //удаляем задачу
+                log.info("удалить задачу и отправить callback о завершении парсинга");
+                String taskId = taskService.peek().getTaskId();
                 taskService.poll();
+                sendCallBack(taskId);
                 processing = false;
             }
         }
@@ -90,5 +95,14 @@ public class ParserService {
     public void register(Parser parser) {
         log.info(String.format("parser %s has been registered", parser.getName()));
         parsers.add(parser);
+    }
+
+    private void sendCallBack(String taskId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("http://localhost:8079")
+                .path("/task/completed/" + taskId);
+        //@GetMapping(path = "/completed/{taskId}")
+        String url = builder.build().encode().toUriString();
+        log.info(String.format("url = %s", url));
+        new RestTemplate().getForEntity(url, ResponseMessage.class);
     }
 }

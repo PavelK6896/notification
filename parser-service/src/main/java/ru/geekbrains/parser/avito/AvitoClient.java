@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.geekbrains.entity.system.Proxy;
+import ru.geekbrains.parser.cian.service.UserAgentService;
 import ru.geekbrains.repository.ProxyRepository;
 import ru.geekbrains.service.system.ProxyService;
 
@@ -41,6 +42,8 @@ public class AvitoClient {
 
     private ProxyService proxyService;
 
+    private UserAgentService userAgentService;
+
     private Proxy proxy;
 
     @Value("${parsers.avito.baseUrl:https://www.avito.ru}")
@@ -56,7 +59,8 @@ public class AvitoClient {
     private String apartmentCategoryUrlPath;
 
     @Autowired
-    public AvitoClient(ProxyService proxyService) {
+    public AvitoClient(ProxyService proxyService, UserAgentService userAgentService) {
+        this.userAgentService = userAgentService;
         this.proxyService = proxyService;
         Optional<Proxy> optionalProxy = proxyService.findByActive();
         if(!optionalProxy.isPresent()){
@@ -139,8 +143,7 @@ public class AvitoClient {
 
     private void prepareHeaders(HttpUriRequest request) {
 
-        //TODO сделать генерацию user agent
-        request.addHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36");
+        request.addHeader(HttpHeaders.USER_AGENT, userAgentService.getRandomUserAgent());
     }
 
     private void setProxy(HttpRequestBase request) {

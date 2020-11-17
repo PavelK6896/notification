@@ -1,5 +1,6 @@
 package ru.geekbrains.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -23,5 +24,6 @@ public class Country {
 
     @OneToMany(mappedBy = "country")
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @JsonIgnore
     List<Region> regions;
 }

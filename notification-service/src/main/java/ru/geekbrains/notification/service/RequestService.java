@@ -16,8 +16,8 @@ public class RequestService {
 
     public List<Notification> notificationList = new ArrayList<>();
 
-    public ResponseEntity<Object> sendMessage(User personalData, List<String> ads) {
-        notificationList.forEach(notification -> notification.sendMessage(personalData, ads));
+    public ResponseEntity<Object> sendMessage(String chatId, String response) {
+        notificationList.forEach(notification -> notification.sendMessage(chatId, response));
         return new ResponseEntity<>("ок", HttpStatus.OK);
     }
 

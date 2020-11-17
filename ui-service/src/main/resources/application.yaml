@@ -4,13 +4,11 @@ server:
     context-path:
 
 
-  #  thymeleaf:
-#    encoding: UTF-8
-#    prefix: file:ui-service/src/main/resources/templates/
-#    cache: false
-#  resources:
-#    static-locations: file:ui-service/src/main/resources/static/
-
+spring:
+  thymeleaf:
+    encoding: UTF-8
+    prefix: file:ui-service/src/main/resources/templates/
+    cache: false
 
 
 jwt:

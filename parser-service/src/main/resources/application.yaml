@@ -9,9 +9,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/realestatenotifier}
-    username: ${SPRING_DATASOURCE_USERNAME:mihailzubarev}
-    password: ${SPRING_DATASOURCE_PASSWORD:_Akvilani33}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/notification}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
 
   jpa:
     generate-ddl: false
@@ -24,7 +24,7 @@ spring:
         temp:
           use_jdbc_metadata_defaults: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
 
   jackson:
     serialization:

@@ -12,10 +12,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 import ru.geekbrains.entity.bot.Answer;
 import ru.geekbrains.entity.bot.BotData;
 import ru.geekbrains.notification.model.User;
-import ru.geekbrains.notification.service.BotState;
-import ru.geekbrains.notification.service.Notification;
-import ru.geekbrains.notification.service.BotStateService;
-import ru.geekbrains.notification.service.TaskService;
+import ru.geekbrains.notification.service.*;
 import ru.geekbrains.repository.UserRepository;
 
 import java.util.Date;
@@ -32,19 +29,44 @@ public class TelegramBot extends TelegramLongPollingBot implements Notification 
     private final UserRepository userRepository;
 
     @Autowired
-    public TelegramBot(TelegramBotsApi telegramBotsApi, BotStateService botStateService, TaskService taskService, UserRepository userRepository) throws TelegramApiRequestException {
+    public TelegramBot(TelegramBotsApi telegramBotsApi, BotStateService botStateService, TaskService taskService, UserRepository userRepository, RequestService requestService) throws TelegramApiRequestException {
         telegramBotsApi.registerBot(this);
         this.botStateService = botStateService;
         this.taskService = taskService;
         this.userRepository = userRepository;
+        requestService.registr(this);
     }
 
-
     @Override
-    public synchronized void sendMessage(User data, List<String> ads) {
+    public void sendMessage(String chatId, String response) {
+        new Thread(() -> {
+            //признак существования объявлений "---"
+            if(response.contains("---")) {
+                String[] ads = response.split("---");
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < ads.length; i++) {
+                    if((i % 5) == 0){
+                        send(chatId, builder.toString());
+                        builder.setLength(0);
+                    } else {
+                        builder.append(ads[i]);
+                    }
+                }
+                send(chatId, builder.toString());
+            } else {
+                send(chatId, "Объявлений по вашему запросов не найдено");
+            }
+        }).start();
+    }
+
+    private synchronized void send (String chatId, String response){
+        if(response.equals("")){
+            return;
+        }
         SendMessage message = new SendMessage()
-                .setChatId(data.getTelegram())
-                .setText(ads.toString());
+                .setChatId(chatId)
+                .setText(response)
+                .setParseMode("Markdown");
         try {
             this.execute(message);
         } catch (TelegramApiException e){

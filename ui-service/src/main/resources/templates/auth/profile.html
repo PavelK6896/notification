@@ -22,60 +22,56 @@
     </style>
 </head>
 <body>
-<div th:replace="~{components/navigation :: navigation(profile)}" />
-<div class="d-flex justify-content-center">
-    <div id="loginbox"
-         class="mainbox col-md-3 col-md-offset-2 col-sm-6 col-sm-offset-2">
+<div th:replace="~{components/navigation :: navigation(profile)}"/>
+<div class="container">
+    <div class="panel panel-primary">
 
-        <div class="panel panel-primary">
+        <div class="panel-heading px-5">
+            <div class="panel-title">Profile</div>
+        </div>
 
-            <div class="panel-heading">
-                <div class="panel-title">Profile</div>
-            </div>
 
-            <div class="panel-body">
-                <form th:action="@{/auth/profile/process}"
-                      th:object="${profileUser}" method="post"
-                      class="form-horizontal"
-                >
+        <div class="panel-body ">
+            <form th:action="@{/profile/process}"
+                  th:object="${profileUser}" method="post"
+                  class="form-horizontal"
+            >
+                <div class="form-group px-4 bg-light">
 
                     <div class="error" th:if="${#fields.hasErrors('whatsApp')}" th:errors="*{whatsApp}"></div>
-                    <div style="margin-bottom: 25px" class="input-group">
+                    <div class="col-4 py-2">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-user">whatsApp</i>
                         <input th:field="*{whatsApp}" placeholder="whatsApp (*)" class="form-control"/></span>
                     </div>
 
                     <div class="error" th:if="${#fields.hasErrors('facebook')}" th:errors="*{facebook}"></div>
-                    <div style="margin-bottom: 25px" class="input-group">
+                    <div class="col-4 py-2">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-user">facebook</i>
                         <input th:field="*{facebook}" placeholder="name (*)" class="form-control"/></span>
                     </div>
 
                     <div class="error" th:if="${#fields.hasErrors('telegram')}" th:errors="*{telegram}"></div>
-                    <div style="margin-bottom: 25px" class="input-group">
+                    <div class="col-4 py-2">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-user">telegram</i>
                         <input th:field="*{telegram}" placeholder="whatsApp (*)" class="form-control"/></span>
                     </div>
 
                     <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-                    <div style="margin-bottom: 25px" class="input-group">
+                    <div class="col-4 py-2">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-user">email</i>
                         <input th:field="*{email}" placeholder="name (*)" class="form-control"/></span>
                     </div>
-
-                    <div style="margin-top: 10px" class="form-group d-flex">
-                        <div class="col-sm-6 controls">
-                            <a type="submit" href="/home" class="btn btn-success w-100">Home</a>
-                        </div>
-
-                        <div class="col-sm-6 controls">
-                            <button type="submit" class="btn btn-primary w-100">Сохранить</button>
-                        </div>
+                </div>
+                <div class="form-group d-flex mb-2">
+                    <div class="col-sm-6 controls">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
+
         </div>
     </div>
+
 </div>
 
 <!-- Optional JavaScript -->

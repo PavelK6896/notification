@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestParam {
+    String taskID;
     User user;
     Answer answer;
     long chatId;

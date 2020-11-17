@@ -22,6 +22,7 @@
 </head>
 
 <body>
+<div th:replace="~{components/navigation :: navigation(singUp)}"/>
 
 <div class="d-flex justify-content-center">
     <div id="loginbox"
@@ -66,10 +67,6 @@
                     </div>
 
                     <div style="margin-top: 10px" class="form-group d-flex">
-                        <div class="col-sm-6 controls">
-                            <a type="submit" href="/auth" class="btn btn-success w-100">Войти</a>
-                        </div>
-
                         <div class="col-sm-6 controls">
                             <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
                         </div>

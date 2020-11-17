@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface RussianAddressObjectRepository extends JpaRepository<RussianAddressObject, String> {
 
-   List<RussianAddressObject> findByFormalName(String objectName);
+   List<RussianAddressObject> findByFormalNameAndShortName(String objectName, String cityType);
 
    Optional<RussianAddressObject> findByAoGuid(String aoGuid);
 }

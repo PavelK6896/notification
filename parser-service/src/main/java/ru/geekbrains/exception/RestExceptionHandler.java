@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import ru.geekbrains.model.ResponseMessage;
+import ru.geekbrains.common.rest.ResponseMessage;
 
 @ControllerAdvice
 @Slf4j
