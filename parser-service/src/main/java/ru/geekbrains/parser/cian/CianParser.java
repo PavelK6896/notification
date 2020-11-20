@@ -14,6 +14,8 @@ import ru.geekbrains.entity.system.Proxy;
 import ru.geekbrains.model.Parser;
 import ru.geekbrains.model.Task;
 import ru.geekbrains.parser.ApartmentParserInterface;
+import ru.geekbrains.parser.cian.utils.ProxyGate;
+import ru.geekbrains.parser.cian.utils.ProxyGateImpl;
 import ru.geekbrains.parser.cian.utils.exception.AdsNotFoundException;
 import ru.geekbrains.parser.cian.utils.exception.CaptchaException;
 import ru.geekbrains.parser.cian.utils.CianRegionDefiner;
@@ -54,29 +56,24 @@ import static java.util.stream.Collectors.groupingBy;
 public class CianParser extends Parser implements Runnable {
 
     private final DataExtractor dataExtractor;
+    private final ProxyGate proxyGate;
     private final CianRegionDefiner cianRegionDefiner;
     private final List<ApartmentParserInterface> cianApartments = new ArrayList<>();
     private boolean isProcessing = false;
     private final String name = "Циан";
-    private ProxyService proxyService;
-    private Proxy proxy;
     private ParserService parserService;
     private Task task;
 
     @Autowired
-    public CianParser(DataExtractor dataExtractor, CianRegionDefiner cianRegionDefiner, ProxyService proxyService, ParserService parserService) {
+    public CianParser(DataExtractor dataExtractor, CianRegionDefiner cianRegionDefiner, ParserService parserService, ProxyGate proxyGate) {
         this.dataExtractor = dataExtractor;
+        this.proxyGate = proxyGate;
         this.cianRegionDefiner = cianRegionDefiner;
-        this.proxyService = proxyService;
-        Optional<Proxy> optionalProxy = proxyService.findByActive();
-        if (!optionalProxy.isPresent()) {
-            throw new RuntimeException("No valid proxy");
-        }
-        this.proxy = optionalProxy.get();
         this.parserService = parserService;
         this.parserService.register(this);
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
     }
+
     /**
      * Starts new Thread, initializes variable task
      *
@@ -91,6 +88,11 @@ public class CianParser extends Parser implements Runnable {
         new Thread(this).start();
     }
 
+    /**
+     * Fills List<CinaApartements> with ads from cain.ru
+     * Search page deep is limited to SEARCH_DEEP value
+     */
+
     @Override
     public void run() {
         setProcessing(true);
@@ -99,19 +101,23 @@ public class CianParser extends Parser implements Runnable {
         }
 
         List<String> regionCodes = cianRegionDefiner.getRegions(task.getCity());
+
         String pageValue = "1";
+        final String SEARCH_DEEP = "5";
+        final String DEAL_TYPE = "rent";
+        final String OFFER_TYPE = "flat";
         boolean hasNextPage = true;
+
         for (String regionCode : regionCodes) {
-            while (!pageValue.equals("3")) { // uncomment to limit search deep to 2 pages. Needed to prevent blocking by IP
-//            while (hasNextPage) {  // uncomment to search throughout all the target pages
+            while (hasNextPage) {  // uncomment to search throughout all the target pages
 
                 URIBuilder uri = new URIBuilder();
                 uri.setScheme("https")
                         .setHost("www.cian.ru")
                         .setPath("/cat.php")
                         .addParameter("engine_version", "2")
-                        .addParameter("deal_type", "rent")
-                        .addParameter("offer_type", "flat")
+                        .addParameter("deal_type", DEAL_TYPE)
+                        .addParameter("offer_type", OFFER_TYPE)
                         .addParameter("region", regionCode)
                         .addParameter("p", pageValue);
 
@@ -124,24 +130,36 @@ public class CianParser extends Parser implements Runnable {
                     }
 
                 };
-//               driver.get("https://ipinfo.io/ip");
+
+                Proxy proxy = proxyGate.getProxy();
+                log.info("proxyGate has returned proxy with host:port - " + proxy.getAddress());
+                driver.setProxy(proxy.getHost(), Integer.parseInt(proxy.getPort()));
+                driver.get("https://ipinfo.io/ip");
+                log.info("Site https://ipinfo.io/ip is reporting that your IP is: " + Jsoup.parse(driver.getPageSource()).getElementsByTag("body").text());
                 driver.get(uri.toString());
+
                 Document document = Jsoup.parse(driver.getPageSource());
 
+                if (document.title().contains("Captcha")) {
+                   log.warn("Proxy " + proxy.getAddress() + " has been banned from " + this.getName());
+                   proxyGate.setProxyBlockedBy(this.getName(), proxy);
+                }
+
                 Elements adTags = document.getElementsByTag("article");
-                if (document.title().contains("Captcha"))
-                    throw new CaptchaException("Your IP address has been blocked");
+
                 if (adTags.size() == 0)
                     throw new AdsNotFoundException("There are no ads can be parsed from the page");
 
-                log.info("Amount of tags on the page: " + adTags.size());
+                log.info("Page #" + pageValue + " is scanned");
+                log.info("Amount of ad tags on the page: " + adTags.size());
 
                 for (Element adTag : adTags) {
                     CianApartment cianApartment = dataExtractor.buildApartment(adTag);
                     if (cianApartment.getCity().equals(task.getCity())) cianApartments.add(cianApartment);
                 }
-                String pageValueMark = document.selectFirst("div[data-name~=^Pagination]").getElementsByTag("li").last().children().first().text();
-                if (!pageValueMark.equals("..")) {
+
+                String lastPageValueMark = document.selectFirst("div[data-name~=^Pagination]").getElementsByTag("li").last().children().first().text();
+                if (lastPageValueMark.equals(pageValue) || pageValue.equals(SEARCH_DEEP)) {
                     hasNextPage = false;
                 }
                 pageValue = String.valueOf(Integer.parseInt(pageValue) + 1);

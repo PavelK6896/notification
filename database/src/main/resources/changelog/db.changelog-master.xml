@@ -35,5 +35,9 @@
     <changeSet id="9" author="mzub">
         <tagDatabase tag="ads_init"/>
     </changeSet>
+    <include file="v-1.2_proxy_alter/db.changelog-v.1.0.xml" relativeToChangelogFile="true"/>
+    <changeSet id="10" author="mzub">
+        <tagDatabase tag="ads_init"/>
+    </changeSet>
 
 </databaseChangeLog>

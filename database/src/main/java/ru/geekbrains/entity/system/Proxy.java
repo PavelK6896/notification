@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "proxies", schema = "system")
@@ -28,6 +29,15 @@ public class Proxy {
 
     @Column(name = "active")
     Boolean active;
+
+    @Column(name = "last_used", columnDefinition = "timestamp default current_timestamp")
+    Timestamp lastUsed;
+
+    @Column(name = "banned_by_avito", columnDefinition = "boolean default false")
+    Boolean bannedByAvito;
+
+    @Column(name = "banned_by_cian", columnDefinition = "boolean default false")
+    Boolean bannedByCian;
 
 
     public String getHost() {

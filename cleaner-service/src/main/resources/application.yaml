@@ -1,0 +1,40 @@
+server:
+  port: ${PORT:8030}
+  servlet:
+    context-path: /
+spring:
+  liquibase:
+    enabled: false
+    change-log: classpath:changelog/db.changelog-master.xml
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/notification}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    properties:
+      hibernate:
+        #        format_sql:true
+        ddl-auto: none
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+        temp:
+          use_jdbc_metadata_defaults: false
+    hibernate:
+      ddl-auto: update
+
+  jackson:
+    serialization:
+      indent_output: true
+
+cleaner:
+  # в формате cron
+  start: "0 0 23 * * ?"
+  delete:
+    older-than: 100
+
+
+
