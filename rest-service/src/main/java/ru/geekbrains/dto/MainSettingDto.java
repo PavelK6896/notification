@@ -1,4 +1,4 @@
-package ru.geekbrains.ui.service.dto;
+package ru.geekbrains.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,5 +1,6 @@
 package ru.geekbrains.service;
 
+import liquibase.pro.packaged.U;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -7,9 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.geekbrains.dto.MainSettingDto;
 import ru.geekbrains.entity.Ad;
 import ru.geekbrains.entity.bot.Answer;
 import ru.geekbrains.entity.bot.BotData;
+import ru.geekbrains.entity.user.User;
 import ru.geekbrains.model.RequestParam;
 import ru.geekbrains.model.ResponseMessage;
 import ru.geekbrains.model.ResponseToNotifier;
@@ -26,6 +29,7 @@ import java.util.*;
 public class RequestService {
 
     private final SearchService searchService;
+    private final UserService userService;
 
     //todo аналог БД для пользовательских запросов, вынести в БД
     private final Map<String, RequestParam> userRequestList = Collections.synchronizedMap(new HashMap<>());
@@ -145,5 +149,30 @@ public class RequestService {
             ResponseMessage message = new ResponseMessage("Уведомление пользователю", String.format("запрос пользователя не найден"));
             return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public  RequestParam createTh(MainSettingDto mainSettingDto, String name) {
+        User user = userService.getUser(name);
+        Answer answer = Answer.builder().city(mainSettingDto.getCity())
+                .country(mainSettingDto.getCountry()).maxPrice(Long.parseLong(mainSettingDto.getPriceTo()))
+                .minPrice(Long.parseLong(mainSettingDto.getPriceFrom())).floor("1").rooms("1").build();
+        // создаем задачу для парсера по новым параметрам
+        Task task = creteTask(answer);
+        RequestParam requestParam = new RequestParam(null, user, answer, Long.parseLong("9999999"), new Date());
+        requestParam.setTaskID(task.getTaskId());
+        String keyRequestParam = getKeyFromUserRequest(requestParam);
+
+        sendResponseStart(requestParam);
+        //отправляем задачу и получаем ответ
+        ResponseEntity<ResponseMessage> responseMessageResponseEntity = sendTaskToParsService(task);
+
+        // проверяем ответ по коду
+        if(responseMessageResponseEntity.getStatusCode() == HttpStatus.CREATED){
+            log.info("задача для парсинга успешно создана");
+            taskList.put(task.getTaskId(), task); //todo когда задача выполнится, ее нужно будет отсюда удалить
+        } else {
+            log.error("ошибка создания задачи");
+        }
+        return requestParam;
     }
 }

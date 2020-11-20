@@ -30,6 +30,7 @@ import java.util.List;
 @Data
 public class Token {
     String token;
+    String result = "there is no suitable one";
 
     @Value("${jwt.secret}")
     private String secretKey;

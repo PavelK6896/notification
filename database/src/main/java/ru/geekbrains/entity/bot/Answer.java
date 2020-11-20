@@ -1,9 +1,6 @@
 package ru.geekbrains.entity.bot;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
@@ -14,6 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Table(name = "answers", schema = "bot")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -45,7 +45,7 @@ public class UserService {
         User user = userRepository.findByLogin(login).orElseThrow(() ->
                 new UsernameNotFoundException("User doesn't exists"));
         PersonalData personalData;
-        if ((personalData = user.getPersonalData()) == null){
+        if ((personalData = user.getPersonalData()) == null) {
             personalData = new PersonalData();
         }
         personalData.setWhatsApp(profileUserDto.getWhatsApp());
@@ -61,5 +61,11 @@ public class UserService {
         User user = userRepository.findByLogin(login).orElseThrow(() ->
                 new UsernameNotFoundException("User doesn't exists"));
         return user.getPersonalData();
+    }
+
+
+    public User getUser(String login) {
+        return userRepository.findByLogin(login).orElseThrow(() ->
+                new UsernameNotFoundException("User doesn't exists"));
     }
 }

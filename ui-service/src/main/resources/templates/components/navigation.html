@@ -42,6 +42,9 @@
                 <li class="nav-item" th:classappend="${activeTab == 'profile' ? 'active' : ''}">
                     <a class="nav-link" th:href="@{/profile}">profile</a>
                 </li>
+                <li class="nav-item" th:classappend="${activeTab == 'result' ? 'active' : ''}">
+                    <a class="nav-link" th:href="@{/result}">result</a>
+                </li>
                 <li th:if="${@token.getToken() != null}" class="nav-item">
                     <a th:href="@{/auth/logout}" class="btn btn-outline-secondary">logout</a>
                 </li>
