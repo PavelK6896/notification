@@ -163,6 +163,7 @@ public class RequestService {
         String keyRequestParam = getKeyFromUserRequest(requestParam);
 
         sendResponseStart(requestParam);
+        userRequestList.put(keyRequestParam, requestParam);
         //отправляем задачу и получаем ответ
         ResponseEntity<ResponseMessage> responseMessageResponseEntity = sendTaskToParsService(task);
 
